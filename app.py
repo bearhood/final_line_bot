@@ -18,6 +18,7 @@ from linebot.models import (
 import json
 import random
 import string
+import sqlite3
 # create flask server
 app = Flask(__name__)
 line_bot_api = LineBotApi('hxxfXJjOA6fUYSSMjyCmia9gvsY1QF10B+El/yFXCzckR3vENxIOsfcQYjrU69ahU6AqIIeIo+MUnX4BU6sbrFsF9anm2uBfdJ64LFe+pj+rcEeG/LCqorcnNOd4V0azO9V5+KO11Kv/XBLjme2ZdgdB04t89/1O/w1cDnyilFU=')
@@ -46,6 +47,7 @@ def callback():
 #以下是提前設定好方程和內容#########################
 
 def details_template(name): #這個是傳出圖片後，彈出的按鈕，給對方選擇想看這個政治人物的什麼訊息
+    print('name==',name)
     template = TemplateSendMessage(
         alt_text='Buttons template',
         template=ButtonsTemplate(
@@ -57,12 +59,12 @@ def details_template(name): #這個是傳出圖片後，彈出的按鈕，給對
                 PostbackAction(
                     label='政見',
                     display_text='我想知道'+name+'的政見',
-                    data='action=顯示政見'
+                    data='action=顯示政見&politician_name={}'.format(name)
                 ),
                 PostbackAction(
                     label='資歷',
                     display_text='我想知道'+name+'的資歷',
-                    data='action=顯示資歷'
+                    data='action=顯示資歷&politician_name={}'.format(name)
                 ),
                 PostbackAction(
                     label='不感興趣了',
@@ -74,9 +76,30 @@ def details_template(name): #這個是傳出圖片後，彈出的按鈕，給對
         )
     return template
 
+
+
 def information(politician_name): #輸入他的名字，輸出他的資訊，剩下的靠你們了
-    政見='他的政見'
-    資歷='他的資歷'
+    print('politician===',politician_name)
+    con = sqlite3.connect('./data/db_text/main_v3.db')
+    cur = con.cursor()
+    def func_fetching( name ):
+        querydata = cur.execute('''SELECT * FROM candidate WHERE `姓名` = '{}';'''.format(name))
+        result_value = [ i for i in querydata ]
+        result_name = (description[0] for description in querydata.description )
+        result = [ dict( zip(result_name,data) ) for data in result_value ]
+        print( result)
+        return result
+    政見=''
+    資歷=''
+    politi_info = func_fetching( politician_name )
+    print( politi_info)
+    try:
+        政見=politi_info[0]['政見']
+        資歷=politi_info[0]['經歷']
+    except:
+        print( 'error occur')
+        政見=''
+        資歷='' 
     return [政見,資歷]
 
 def others_template():
@@ -111,6 +134,8 @@ def others_template():
 #################################################
 
 #區塊二和三，建議從這邊開始看
+
+#接收 所有圖片訊息
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
     # get user info & message
@@ -133,17 +158,21 @@ def handle_image(event):
 
     # get msg details
     print('img from [', user_name, '](', user_id, ') ')
-    
+
+# 以下為所有接收到按鈕後的集散地
 @handler.add(PostbackEvent) #有注意到details_message的按鈕上有"data=action=某某某"的部分嗎，那就是拿來觸發postback的事件
-def handle_postback(event,politician_name):
+def handle_postback(event):
+    
     user_id = event.source.user_id
     user_name = line_bot_api.get_profile(user_id).display_name
     # print(event.postback.data)
     postback_data = dict(parse_qsl(event.postback.data))
+    politician_name = postback_data.get('politician_name')
     # print(postback_data.get('action', ''))
     # print(postback_data.get('item', ''))
     sticker_list=[(1070, 17839), (6362, 11087920), (11537, 52002734), (8525, 16581293)]
     info=information(politician_name)
+    print('handle_postback__name = ' , politician_name)
     if postback_data.get('action')=='顯示政見':
         messages=[]
         messages.append(TextSendMessage(text=f'他的政見為:\n{info[0]}'))
@@ -161,6 +190,8 @@ def handle_postback(event,politician_name):
         messages.append(TextSendMessage(text='我們是中央大學的學生，作者有:王本偉、田家瑋、官慶睿、林泓宇、林恩立、李恆緯'))
         line_bot_api.reply_message(event.reply_token, messages)
 
+
+# 我猜應該是接收所有文字的集散地
 @handler.add(MessageEvent, message=TextMessage)
 def text_message(event):
     # get user info & message
@@ -173,10 +204,15 @@ def text_message(event):
             print('1')
             line_bot_api.reply_message(event.reply_token, messages)
             print('2')
+        elif( '我想知道:' in receive_text ):
+            messages=[]
+            politicitian_name = receive_text.split(':')[-1]
+            messages.append(TextSendMessage(text='他的名字是：'+politicitian_name),)
+            messages.append(details_template(politicitian_name))
+            line_bot_api.reply_message(event.reply_token, messages)
         else:
             messages=TextSendMessage(text='請傳給我您有興趣的政治家的照片，或者打”其他”找其他資訊')
             line_bot_api.reply_message(event.reply_token, messages)
-
 
     # get msg details
     print('img from [', user_name, '](', user_id, ') ')
