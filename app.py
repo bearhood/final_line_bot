@@ -16,6 +16,8 @@ from linebot.models import (
     PostbackEvent, ConfirmTemplate, CarouselTemplate, CarouselColumn,
     ImageCarouselTemplate, ImageCarouselColumn, FlexSendMessage,ImageMessage
 )
+
+import urllib.parse
 import json
 import random
 import string
@@ -184,8 +186,11 @@ def handle_postback(event):
     if postback_data.get('action')=='顯示政見':
         messages=[]
         if( info[0]== 'img'):
-            #messages.append(ImageSendMessage(image = ))
-            pass
+            dir = 'https://github.com/bearhood/final_line_bot/raw/main/data/db_pic/'
+            url = dir+'{}.jpg'.format(urllib.parse.quote(politician_name) )
+            print(url)
+            messages.append(ImageSendMessage(original_content_url=url,
+                                             preview_image_url=url))
         else:
             messages.append(TextSendMessage(text=f'他的政見為:\n{info[0]}'))
         line_bot_api.reply_message(event.reply_token, messages)
