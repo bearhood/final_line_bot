@@ -50,11 +50,13 @@ def callback():
 
 def details_template(name): #這個是傳出圖片後，彈出的按鈕，給對方選擇想看這個政治人物的什麼訊息
     print('name==',name)
+    dir = 'https://github.com/bearhood/final_line_bot/raw/main/data/db_person_pic/'
     template = TemplateSendMessage(
         alt_text='Buttons template',
         template=ButtonsTemplate(
             # thumbnail_image_url=url_for('static', filename='images/brown_1024.jpg', _external=True),
-            thumbnail_image_url='https://creazilla-store.fra1.digitaloceanspaces.com/emojis/42646/man-office-worker-emoji-clipart-md.png',
+            
+            thumbnail_image_url= dir+'{}.jpg'.format(urllib.parse.quote(name) ),
             title='想知道關於他的什麼呢？',
             text='關於'+name+'的訊息',
             actions=[
