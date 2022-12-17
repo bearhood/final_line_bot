@@ -1,10 +1,11 @@
 # import flask related
+from api_keys import line_bot_api, handler
+
+
 from flask import Flask, request, abort
 from urllib.parse import parse_qsl
 # import linebot related
-from linebot import (
-    LineBotApi, WebhookHandler
-)
+
 from linebot.exceptions import (
     InvalidSignatureError
 )
@@ -21,8 +22,7 @@ import string
 import sqlite3
 # create flask server
 app = Flask(__name__)
-line_bot_api = LineBotApi('hxxfXJjOA6fUYSSMjyCmia9gvsY1QF10B+El/yFXCzckR3vENxIOsfcQYjrU69ahU6AqIIeIo+MUnX4BU6sbrFsF9anm2uBfdJ64LFe+pj+rcEeG/LCqorcnNOd4V0azO9V5+KO11Kv/XBLjme2ZdgdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('525516aa02080443145d3c92301186fc')
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -76,30 +76,38 @@ def details_template(name): #這個是傳出圖片後，彈出的按鈕，給對
         )
     return template
 
+def func_fetching( cur, name ):
+    '''
+    此處為調閱候選人的資料的函數:  cur 為檔案的指標, name 為候選人的姓名
+    回傳為 list：
+    ex:
+        [{'單位': '臺北市第8屆市長',
+            '號次': 6,
+            '姓名': '蔣萬安',
+            '生日': '67 年 12 月 26 日',
+            '政見': '大家好我叫蔣萬安'}]
 
-
+    '''
+    querydata = cur.execute('''SELECT * FROM candidate WHERE `姓名` = '{}';'''.format(name))
+    result_value = [ i for i in querydata ]
+    result_name = (description[0] for description in querydata.description )
+    result = [ dict( zip(result_name,data) ) for data in result_value ]
+    print( result)
+    return result
 def information(politician_name): #輸入他的名字，輸出他的資訊，剩下的靠你們了
-    print('politician===',politician_name)
+    print('politician==',politician_name)
     con = sqlite3.connect('./data/db_text/main_v3.db')
     cur = con.cursor()
-    def func_fetching( name ):
-        querydata = cur.execute('''SELECT * FROM candidate WHERE `姓名` = '{}';'''.format(name))
-        result_value = [ i for i in querydata ]
-        result_name = (description[0] for description in querydata.description )
-        result = [ dict( zip(result_name,data) ) for data in result_value ]
-        print( result)
-        return result
     政見=''
     資歷=''
-    politi_info = func_fetching( politician_name )
+    politi_info = func_fetching( cur, politician_name )
     print( politi_info)
-    try:
-        政見=politi_info[0]['政見']
+
+    if( len( politi_info ) != 0 ):
         資歷=politi_info[0]['經歷']
-    except:
-        print( 'error occur')
-        政見=''
-        資歷='' 
+        政見=politi_info[0]['政見']
+    else:
+        print( "No one is fitted")
     return [政見,資歷]
 
 def others_template():
@@ -175,7 +183,11 @@ def handle_postback(event):
     print('handle_postback__name = ' , politician_name)
     if postback_data.get('action')=='顯示政見':
         messages=[]
-        messages.append(TextSendMessage(text=f'他的政見為:\n{info[0]}'))
+        if( info[0]== 'img'):
+            #messages.append(ImageSendMessage(image = ))
+            pass
+        else:
+            messages.append(TextSendMessage(text=f'他的政見為:\n{info[0]}'))
         line_bot_api.reply_message(event.reply_token, messages)
     elif postback_data.get('action')=='顯示資歷':
         messages=[]
@@ -205,11 +217,21 @@ def text_message(event):
             line_bot_api.reply_message(event.reply_token, messages)
             print('2')
         elif( '我想知道:' in receive_text ):
+            con = sqlite3.connect('./data/db_text/main_v3.db')
+            cur = con.cursor()
+
+            
             messages=[]
             politicitian_name = receive_text.split(':')[-1]
-            messages.append(TextSendMessage(text='他的名字是：'+politicitian_name),)
-            messages.append(details_template(politicitian_name))
-            line_bot_api.reply_message(event.reply_token, messages)
+
+            data = func_fetching(cur, politicitian_name)
+            if( len( data ) != 0 ):
+                messages.append(TextSendMessage(text='他的名字是：'+politicitian_name),)
+                messages.append(details_template(politicitian_name))
+                line_bot_api.reply_message(event.reply_token, messages)
+            else:
+                messages.append(TextSendMessage(text='資料庫裡面沒有：'+politicitian_name),)
+                line_bot_api.reply_message(event.reply_token, messages)
         else:
             messages=TextSendMessage(text='請傳給我您有興趣的政治家的照片，或者打”其他”找其他資訊')
             line_bot_api.reply_message(event.reply_token, messages)
