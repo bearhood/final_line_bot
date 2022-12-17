@@ -8,7 +8,10 @@ api_keys.py
 from linebot import (
     LineBotApi, WebhookHandler
 )
+
 line_bot_api = LineBotApi('')
+
+
 handler = WebhookHandler('')
 
 以上
