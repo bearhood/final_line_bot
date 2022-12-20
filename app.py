@@ -180,6 +180,7 @@ def face_detect_demo( img ):
         if text == name[int(idnum)-1]:
             print(text)
             return (text, img)
+    return(text,img)
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
@@ -191,16 +192,22 @@ def handle_image(event):
         image_content = line_bot_api.get_message_content(event.message.id)
         image_name = image_name.upper()+'.jpg'
         path='./result/origin/'+image_name
+        
         with open(path, 'wb') as fd:
             for chunk in image_content.iter_content():
                 fd.write(chunk) #在這裡把圖檔存起來了，在static資料夾裡
         received_img = cv2.imread(path)
+        print( 'path = ',path)
         policitian_name,img = face_detect_demo( received_img )
-        cv2.imwrite('./result/processed/{}.jpg'.format(image_name),img )
+        cv2.imwrite('./result/processed/{}'.format(image_name),img )
         # policitian_name='someone' #我不知道你會怎麼處理，反正就是傳政治家的名字
         messages=[]
-        messages.append(TextSendMessage(text='他的名字是：'+policitian_name))
-        messages.append(details_template(policitian_name))
+        if( policitian_name !='???' ):
+            messages.append(TextSendMessage(text='他的名字是：'+policitian_name))
+            messages.append(details_template(policitian_name))
+        else:
+            messages.append(TextSendMessage(text='抱歉！辨識不出來是誰'))
+
         line_bot_api.reply_message(event.reply_token, messages)
         #print(postback_data.get('action'))
 

@@ -129,7 +129,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+/result/origin
+/result/processed
 
+empty*
 
 
 
