@@ -148,6 +148,39 @@ def others_template():
 #區塊二和三，建議從這邊開始看
 
 #接收 所有圖片訊息
+import cv2
+def face_detect_demo( img ):
+    name = ['張家豪',
+            '王文娟',
+            '鄭匡宇',
+            '黃聖峰',
+            '童文薰',
+            '蔣萬安',
+            '蘇煥智',
+            '黃珊珊',
+            '施奉先',
+            '唐新民',
+            '謝立康',
+            '陳時中']
+    cascade_path = r'.\data\db_cv2NET\haarcascade_frontalface_default.xml'
+    face_cascade = cv2.CascadeClassifier(cascade_path)
+    recog = cv2.face.LBPHFaceRecognizer_create()         # 啟用訓練人臉模型方法
+    recog.read(r'.\data\db_cv2NET\face.yml')                            # 讀取人臉模型檔
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 轉換成黑白
+    faces = face_cascade.detectMultiScale(gray,1.1)  # 追蹤人臉 ( 目的在於標記出外框 )
+    for(x,y,w,h) in faces:
+        cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)            # 標記人臉外框
+        idnum,confidence = recog.predict(gray[y:y+h,x:x+w])  # 取出 id 號碼以及信心指數 confidence
+        if confidence < 60:
+            text = name[int(idnum)-1]                               # 如果信心指數小於 60，取得對應的名字
+        else:
+            text = '???'                                          # 不然名字就是 ???
+        # 在人臉外框旁加上名字
+        cv2.putText(img, text, (x,y-5),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv2.LINE_AA)
+        if text == name[int(idnum)-1]:
+            print(text)
+    return (text, img)
+
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
     # get user info & message
@@ -161,9 +194,12 @@ def handle_image(event):
         with open(path, 'wb') as fd:
             for chunk in image_content.iter_content():
                 fd.write(chunk) #在這裡把圖檔存起來了，在static資料夾裡
-        policitian_name='someone' #我不知道你會怎麼處理，反正就是傳政治家的名字
+        received_img = cv2.imread(path)
+        policitian_name,img = face_detect_demo( received_img )
+        cv2.imwrite('./result/{}.jpg'.format(image_name),img )
+        # policitian_name='someone' #我不知道你會怎麼處理，反正就是傳政治家的名字
         messages=[]
-        messages.append(TextSendMessage(text='他的名字是：'+policitian_name),)
+        messages.append(TextSendMessage(text='他的名字是：'+policitian_name))
         messages.append(details_template(policitian_name))
         line_bot_api.reply_message(event.reply_token, messages)
         #print(postback_data.get('action'))
