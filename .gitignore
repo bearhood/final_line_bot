@@ -129,11 +129,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.static
-/static
 
-.result
-/result
+
+
 
 #files
 api_keys.py

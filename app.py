@@ -179,7 +179,7 @@ def face_detect_demo( img ):
         cv2.putText(img, text, (x,y-5),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv2.LINE_AA)
         if text == name[int(idnum)-1]:
             print(text)
-    return (text, img)
+            return (text, img)
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
@@ -190,13 +190,13 @@ def handle_image(event):
         image_name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(4)) #生成圖檔名字
         image_content = line_bot_api.get_message_content(event.message.id)
         image_name = image_name.upper()+'.jpg'
-        path='./static/'+image_name
+        path='./result/origin/'+image_name
         with open(path, 'wb') as fd:
             for chunk in image_content.iter_content():
                 fd.write(chunk) #在這裡把圖檔存起來了，在static資料夾裡
         received_img = cv2.imread(path)
         policitian_name,img = face_detect_demo( received_img )
-        cv2.imwrite('./result/{}.jpg'.format(image_name),img )
+        cv2.imwrite('./result/processed/{}.jpg'.format(image_name),img )
         # policitian_name='someone' #我不知道你會怎麼處理，反正就是傳政治家的名字
         messages=[]
         messages.append(TextSendMessage(text='他的名字是：'+policitian_name))
