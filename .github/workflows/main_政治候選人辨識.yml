@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: '政治候選人辨識'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4039724D793B4ACDB0B6C2B89433CB14 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5D3AA085714E47739418DB033C1E4F1D }}
