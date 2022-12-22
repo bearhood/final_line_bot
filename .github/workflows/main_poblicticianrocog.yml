@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'PoblicticianRocog'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_72CDA5171C334520A5A20438B67701B5 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B424EAD729FF458F9626BBD4D7B377D4 }}
