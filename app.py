@@ -23,8 +23,22 @@ import random
 import string
 import sqlite3
 # create flask server
-app = Flask(__name__)
+from flask import Flask, render_template 
 
+
+
+app = Flask(__name__)
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/service')
+def show_service_detail():
+    return render_template('service.html')
+
+@app.route('/ai')
+def index1():
+    return render_template('ai.html')
 
 @app.route("/callback", methods=['POST'])
 def callback():

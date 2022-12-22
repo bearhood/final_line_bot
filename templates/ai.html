@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>AI 候選人辨識系統</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="static/css/main.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+								<header id="header">
+									<a href="index.html" class="logo"><strong>候選人辨識系統-AI介紹</strong></a>
+									<ul class="icons">
+										<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+										<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+										<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a></li>
+										<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+										<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+									</ul>
+								</header>
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h1>AI 介紹</h1>
+									</header>
+									
+
+									<!-- Content -->
+										<hr class="major"/>
+										<div class="col">
+											<div class="col-6 col-12-small">
+												<h3>如何訓練與運作AI模型</h3>
+												<p>引入OpenCV人臉追蹤模型，並透過讀取我們存放在特定資料夾中想要辨別的人物照片，將照片轉換成黑白以增快讀取效率，並將圖片轉換成指定編碼的numpy陣列，獲取圖片人臉特徵後，記錄人臉特徵數據並賦予其id，之後便開始訓練然後獲得人臉辨識模型。取得人臉辨識模型之後，我們將人臉用外框框起並透過模型辨識結果將結果顯示在外框旁。</p>
+											</div>
+											<div class="col-6 col-12-small">
+												<h3>運作情形</h3>
+												<p>人物圖片在一般情況下皆能正確框出人臉，且圖片解析度清晰的話能夠正確辨識出我們模型裡訓練好的要辨識的人物，沒有出現在模型裡的人則會顯示未知。</p>
+											</div>
+											<div class="col-6 col-12-small">
+												<h3>問題與省思</h3>
+												<p>由於十二位候選人中，有幾位候選人在網路上的圖片過於少，導致模型會缺少某些人物的數據，以至於會發生辨別失誤或者是無法成功辨別出此人為誰。</p>
+											</div>
+											
+										</div>
+										
+
+										<hr class="major" />
+
+								</section>
+
+						</div>
+					</div>
+
+				<!-- Sidebar -->
+					<div id="sidebar">
+						<div class="inner">
+
+							<!-- Search -->
+								<section id="search" class="alt">
+									<form method="post" action="#">
+										<input type="text" name="query" id="query" placeholder="Search" />
+									</form>
+								</section>
+
+							<!-- Menu -->
+								<nav id="menu">
+									<header class="major">
+										<h2>Menu</h2>
+									</header>
+									<ul>
+										<li><a href="/">Homepage</a></li>
+										<li><a href="service">Service Introduction</a></li>
+										<li><a href="ai">AI Introduction</a></li>
+										
+									</ul>
+								</nav>
+
+							<!-- Footer -->
+								<footer id="footer">
+									<p class="copyright">&copy; Untitled. All rights reserved. Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+								</footer>
+
+						</div>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="static/js/jquery.min.js"></script>
+			<script src="static/js/browser.min.js"></script>
+			<script src="static/js/breakpoints.min.js"></script>
+			<script src="static/js/util.js"></script>
+			<script src="static/js/main.js"></script>
+
+	</body>
+</html>
