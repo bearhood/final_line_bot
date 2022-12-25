@@ -176,22 +176,37 @@ def face_detect_demo( img ):
             '唐新民',
             '謝立康',
             '陳時中']
+    name = [
+    "唐新民",
+    "張家豪",
+    "施奉先",
+    "王文娟",
+    "童文薰",
+    "蔣萬安",
+    "蘇煥智",
+    "謝立康",
+    "鄭匡宇",
+    "陳時中",
+    "黃珊珊",
+    "黃聖峰"
+    ]
     cascade_path = r'.\data\db_cv2NET\haarcascade_frontalface_default.xml'
     face_cascade = cv2.CascadeClassifier(cascade_path)
     recog = cv2.face.LBPHFaceRecognizer_create()         # 啟用訓練人臉模型方法
-    recog.read(r'.\data\db_cv2NET\face.yml')                            # 讀取人臉模型檔
+    recog.read(r'.\data\db_cv2NET\face1.yml')                            # 讀取人臉模型檔
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 轉換成黑白
     faces = face_cascade.detectMultiScale(gray,1.1)  # 追蹤人臉 ( 目的在於標記出外框 )
     for(x,y,w,h) in faces:
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)            # 標記人臉外框
         idnum,confidence = recog.predict(gray[y:y+h,x:x+w])  # 取出 id 號碼以及信心指數 confidence
+        print( 'idnum: ',str(idnum))
         if confidence < 60:
             text = name[int(idnum)-1]                               # 如果信心指數小於 60，取得對應的名字
         else:
             text = '???'                                          # 不然名字就是 ???
         # 在人臉外框旁加上名字
         cv2.putText(img, text, (x,y-5),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv2.LINE_AA)
-        if text == name[int(idnum)-1]:
+        if text == name[int(idnum)-2]:
             print(text)
             return (text, img)
     return(text,img)
