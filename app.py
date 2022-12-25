@@ -217,7 +217,10 @@ def handle_image(event):
         # policitian_name='someone' #我不知道你會怎麼處理，反正就是傳政治家的名字
         messages=[]
         if( policitian_name !='???' ):
-            messages.append(TextSendMessage(text='他的名字是：'+policitian_name))
+            con = sqlite3.connect('./data/db_text/main_v3.db')
+            cur = con.cursor()
+            data = func_fetching(cur,policitian_name)
+            messages.append(TextSendMessage(text='他是{}候選人：{}'.format(data[0]['單位'],policitian_name)))
             messages.append(details_template(policitian_name))
         else:
             messages.append(TextSendMessage(text='抱歉！辨識不出來是誰'))
@@ -290,7 +293,7 @@ def text_message(event):
 
             data = func_fetching(cur, politicitian_name)
             if( len( data ) != 0 ):
-                messages.append(TextSendMessage(text='他的名字是：'+politicitian_name),)
+                messages.append(TextSendMessage(text='他是{}候選人：{}'.format(data[0]['單位'],politicitian_name)),)
                 messages.append(details_template(politicitian_name))
                 line_bot_api.reply_message(event.reply_token, messages)
             else:
