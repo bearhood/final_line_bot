@@ -177,6 +177,8 @@ def face_detect_demo( img ):
             '謝立康',
             '陳時中']
     text_ret = ''
+    confidence_crit = 95
+    confidence_min = confidence_crit
     cascade_path = r'.\data\db_cv2NET\haarcascade_frontalface_default.xml'
     face_cascade = cv2.CascadeClassifier(cascade_path)
     recog = cv2.face.LBPHFaceRecognizer_create()         # 啟用訓練人臉模型方法
@@ -186,16 +188,19 @@ def face_detect_demo( img ):
     for(x,y,w,h) in faces:
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)            # 標記人臉外框
         idnum,confidence = recog.predict(gray[y:y+h,x:x+w])  # 取出 id 號碼以及信心指數 confidence
-        if confidence < 60:
-            text = name[int(idnum)-1]                               # 如果信心指數小於 60，取得對應的名字
+        print(name[int(idnum)-1] )
+        print(confidence)
+        if confidence < confidence_crit:
+            text = name[int(idnum)-1]
         else:
             text = '???'                                          # 不然名字就是 ???
         # 在人臉外框旁加上名字
         cv2.putText(img, text, (x,y-5),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv2.LINE_AA)
-        if text != '???':
-            print(text)
-            text_ret = text
 
+        if text != '???' and confidence < confidence_min :
+            print(text)
+            confidence_min = confidence
+            text_ret = text
     if( text_ret != '' ):
         return(text_ret,img)
     else:
@@ -225,7 +230,7 @@ def handle_image(event):
             con = sqlite3.connect('./data/db_text/main_v3.db')
             cur = con.cursor()
             data = func_fetching(cur,policitian_name)
-            messages.append(TextSendMessage(text='他是{}候選人：{}'.format(data[0]['單位'],policitian_name)))
+            messages.append(TextSendMessage(text='他是{}候選人{}號：{}'.format(data[0]['單位'],data[0]['號次'],policitian_name)))
             messages.append(details_template(policitian_name))
         else:
             messages.append(TextSendMessage(text='抱歉！辨識不出來是誰'))
