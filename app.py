@@ -176,6 +176,7 @@ def face_detect_demo( img ):
             '唐新民',
             '謝立康',
             '陳時中']
+    text_ret = ''
     cascade_path = r'.\data\db_cv2NET\haarcascade_frontalface_default.xml'
     face_cascade = cv2.CascadeClassifier(cascade_path)
     recog = cv2.face.LBPHFaceRecognizer_create()         # 啟用訓練人臉模型方法
@@ -191,10 +192,14 @@ def face_detect_demo( img ):
             text = '???'                                          # 不然名字就是 ???
         # 在人臉外框旁加上名字
         cv2.putText(img, text, (x,y-5),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2, cv2.LINE_AA)
-        if text == name[int(idnum)-1]:
+        if text != '???':
             print(text)
-            return (text, img)
-    return(text,img)
+            text_ret = text
+
+    if( text_ret != '' ):
+        return(text_ret,img)
+    else:
+        return('???',img)
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
